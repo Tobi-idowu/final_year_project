@@ -13,3 +13,5 @@ model = models.Cellpose(model_type='cyto', gpu=True)  # or 'nuclei' for nuclear 
 
 # Train the model
 train.train_model(images, masks, model=model, diameter=60, batch_size=8, epochs=100, augment=True)
+
+#i then need to serialize the model
