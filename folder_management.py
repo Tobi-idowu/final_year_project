@@ -1,24 +1,26 @@
 from pathlib import Path
 import numpy as np
 import os
+import shutil
 
-# Path to the directory containing the files
-mask_dir = "/home/oi5/final_year_project/data/segmented_data/segmentation_masks"
+# Set the source and destination folder paths
+source_folder = 'data/segmented_data/segmentation_masks_tif'
+destination_folder = 'data/segmented_data/segmentation_masks_tif_blurred'
 
-# Iterate through all files in the directory
-for filename in os.listdir(mask_dir):
-    # Check if the filename ends with "mask.tif"
-    if filename.endswith("mask.npy") and not filename.endswith("masks.npy"):
-        # Create the new filename
-        new_filename = filename.replace("mask.npy", "masks.npy")
+# Ensure the destination folder exists
+os.makedirs(destination_folder, exist_ok=True)
+
+# Iterate through files in the source folder
+for filename in os.listdir(source_folder):
+    # Check if the file ends with '_blurred.tif'
+    if filename.endswith('_blurred_masks.tif'):
+        # Construct full file paths
+        source_file = os.path.join(source_folder, filename)
+        destination_file = os.path.join(destination_folder, filename)
         
-        # Get full paths
-        old_path = os.path.join(mask_dir, filename)
-        new_path = os.path.join(mask_dir, new_filename)
-        
-        # Rename the file
-        os.rename(old_path, new_path)
-        print(f"Renamed: {old_path} -> {new_path}")
+        # Move the file
+        shutil.move(source_file, destination_file)
+        print(f'Moved: {filename}')
 
 
 

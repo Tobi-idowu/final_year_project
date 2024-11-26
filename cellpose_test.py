@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 
 image = tiff.imread(f'cellpose_all/pupa_1_stage_1_cropped_0001.tif')
 
+#this might have to be cyto3
 model = models.Cellpose(model_type='cyto', gpu=True)
 
 #unsure of the average diameter (average cell diameter in pixels)
