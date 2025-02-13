@@ -2,8 +2,8 @@ from PIL import Image
 import cv2
 import numpy as np
 
-frame1 = Image.open('cellpose_all/pupa_1_stage_1_cropped_0006.tif')
-frame2 = Image.open('cellpose_all/pupa_1_stage_1_cropped_0007.tif')
+frame1 = Image.open('../cellpose_all/pupa_1_stage_1_cropped_0006.tif')
+frame2 = Image.open('../cellpose_all/pupa_1_stage_1_cropped_0007.tif')
 
 gray1 = np.array(frame1.convert("L"))
 gray2 = np.array(frame2.convert("L"))
@@ -26,7 +26,7 @@ step = 20
 for y in range(0, gray1.shape[0], step):
     for x in range(0, gray1.shape[1], step):
         # Get the flow vectors at each (x, y)
-        flow_at_pixel = flow[y, x]
+        flow_at_pixel = flow[y][x]
         
         # The flow is given as (dx, dy), where:
         dx, dy = flow_at_pixel[0], flow_at_pixel[1]
