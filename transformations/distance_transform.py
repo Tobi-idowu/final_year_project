@@ -1,4 +1,3 @@
-from PIL import Image
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
@@ -12,7 +11,7 @@ data = data.item()
 # Access the image data from the dictionary (replace 'image_key' with the correct key)
 image_data = data['outlines']
 
-np.set_printoptions(threshold=np.inf)
+#np.set_printoptions(threshold=np.inf)
 #print(image_data)
 
 #image_data[image_data > 0] = 1
