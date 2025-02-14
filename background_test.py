@@ -6,9 +6,9 @@ def print_every_ten_seconds():
         while True:
             print(f"The count is {count}")
             count += 1
-            time.sleep(10)  # Wait for 10 seconds
+            time.sleep(10)  #wait for 10 seconds
     except KeyboardInterrupt:
         print("Program stopped by user.")
 
-# Run the function
+#run the function
 print_every_ten_seconds()
