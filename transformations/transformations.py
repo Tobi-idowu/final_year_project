@@ -11,16 +11,16 @@ def distance_transform(file_path = None):
     file_path = '../cellpose_all/pupa_1_stage_1_cropped_0000_seg.npy'
     data = np.load(file_path, allow_pickle=True)
 
-    # Unpack the object
+    #unpack the object
     data = data.item()
 
-    # Access the image data from the dictionary
+    #access the image data from the dictionary
     image_data = data['outlines']
 
     #image_data[image_data > 0] = 1
     binary_image = (image_data <= 0).astype(np.uint8)
 
-    # Compute the distance transform
+    #compute the distance transform
     dist_transform = cv2.distanceTransform(binary_image, cv2.DIST_L2, 5)
 
     #flatten the distance transform into a 1d array
@@ -74,8 +74,6 @@ def cellpose_gradient_mask(image = None):
     return gradient_vectors
 
 def main():
-    distance_transform()
-    optic_flow()
     cellpose_gradient_mask()
 
 

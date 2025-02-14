@@ -19,26 +19,26 @@ flow = cv2.calcOpticalFlowFarneback(
 
 flow_visualisation = cv2.cvtColor(grey1, cv2.COLOR_GRAY2BGR)
 
-# Skip every 20 pixels for visualisation (you can adjust this number)
+#skip every 20 pixels for visualisation (you can adjust this number)
 step = 20
 
-# Loop through the image and draw arrows
+#loop through the image and draw arrows
 for y in range(0, grey1.shape[0], step):
     for x in range(0, grey1.shape[1], step):
-        # Get the flow vectors at each (x, y)
+        #get the flow vectors at each (x, y)
         flow_at_pixel = flow[y][x]
         
-        # The flow is given as (dx, dy), where:
+        #the flow is given as (dx, dy), where:
         dx, dy = flow_at_pixel[0], flow_at_pixel[1]
 
-        # Draw an arrow from (x, y) to (x + dx, y + dy)
+        #draw an arrow from (x, y) to (x + dx, y + dy)
         start_point = (x, y)
         end_point = (int(x + dx), int(y + dy))
 
-        # Draw the arrow on the image (use arrowedLine for visualisation)
+        #draw the arrow on the image (use arrowedLine for visualisation)
         cv2.arrowedLine(flow_visualisation, start_point, end_point, (0, 255, 0), 1, tipLength=0.1)
 
-# Display the result
+#display the result
 cv2.imshow("Optical Flow with Arrows", flow_visualisation)
 cv2.waitKey(0)
 cv2.destroyAllWindows()

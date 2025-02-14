@@ -1,15 +1,15 @@
 import numpy as np
-# import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 
-# Allow loading object arrays
+#allow loading object arrays
 file_path = 'cellpose_all/pupa_1_stage_1_cropped_0000_seg.npy'
 data = np.load(file_path, allow_pickle=True)
 
-# Unpack the object
+#unpack the object
 data = data.item()
 
-# Access the image data from the dictionary (replace 'image_key' with the correct key)
+#access the image data from the dictionary (replace 'image_key' with the correct key)
 image_data = data['outlines']
 
 #fill in the cells using the outlines
@@ -18,7 +18,7 @@ image_data = data['outlines']
 
 
 
-# greyscale image
-# plt.imshow(image_data, cmap='gray')
-# plt.axis('off')
-# plt.show()
+#greyscale image
+#plt.imshow(image_data, cmap='gray')
+#plt.axis('off')
+#plt.show()
