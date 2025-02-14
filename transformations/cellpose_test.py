@@ -1,6 +1,8 @@
 from cellpose import models
 import tifffile as tiff
-import matplotlib.pyplot as plt
+import cv2
+import numpy as np
+from PIL import Image
 
 # import torch
 # print(torch.cuda.is_available())  # Should return True
@@ -27,18 +29,19 @@ gradient_vectors = np.stack((flows[0][1][0], flows[0][1][1]), axis=-1)
 # Flatten the 3D array (height, width, 2) to a 2D array where each element is [dx, dy]
 gradient_vectors = gradient_vectors.reshape(1024,1024,2)
 
-image = Image.open('../cellpose_all/pupa_1_stage_1_cropped_0001.tif')
+#image = Image.open('../cellpose_all/pupa_1_stage_1_cropped_0001.tif')
 
-gray_image = np.array(image.convert("L"))
+#grey_image = np.array(image.convert("L"))
 
-visualization = cv2.cvtColor(gray_image, cv2.COLOR_GRAY2BGR)
+#visualisation = cv2.cvtColor(grey_image, cv2.COLOR_GRAY2BGR)
+visualisation = np.array(image)
 
-# Skip every 15 pixels for visualization 
+# Skip every 15 pixels for visualisation 
 step = 15
 
 # Loop through the image and draw arrows
-for y in range(0, gray_image.shape[0], step):
-    for x in range(0, gray_image.shape[1], step):
+for y in range(0, visualisation.shape[0], step):
+    for x in range(0, visualisation.shape[1], step):
         # Get the flow vectors at each (x, y)
         dx, dy = gradient_vectors[y][x][1], gradient_vectors[y][x][0]  # flow[0, y, x] is dx, flow[1, y, x] is dy
 
@@ -46,10 +49,10 @@ for y in range(0, gray_image.shape[0], step):
         start_point = (x, y)
         end_point = (int(x + dx), int(y + dy))
 
-        # Draw the arrow on the image (use arrowedLine for visualization)
-        cv2.arrowedLine(visualization, start_point, end_point, (0, 255, 0), 1, tipLength=0.1)
+        # Draw the arrow on the image (use arrowedLine for visualisation)
+        cv2.arrowedLine(visualisation, start_point, end_point, (0, 255, 0), 1, tipLength=0.1)
 
 # Display the result
-cv2.imshow("Optical Flow with Arrows", visualization)
+cv2.imshow("Optical Flow with Arrows", visualisation)
 cv2.waitKey(0)
 cv2.destroyAllWindows()

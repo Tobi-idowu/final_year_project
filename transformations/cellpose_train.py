@@ -18,7 +18,7 @@ for filename in sorted(os.listdir(image_dir)):
         filepath = os.path.join(image_dir, filename)
         img = imread(filepath)
         
-        # Convert to grayscale if RGB
+        # Convert to greyscale if RGB
         if len(img.shape) == 3:  # RGB image
             images.append(img)
             #print(f"Mask {filename}: shape {img.shape}")

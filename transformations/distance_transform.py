@@ -21,13 +21,13 @@ binary_image = (image_data <= 0).astype(np.uint8)
 dist_transform = cv2.distanceTransform(binary_image, cv2.DIST_L2, 5)  # L2 is Euclidean distance
 
 # Display the result using matplotlib
-plt.imshow(dist_transform, cmap='jet', vmin=0, vmax=30)  # Using a color map to visualize distances
+plt.imshow(dist_transform, cmap='jet', vmin=0, vmax=30)  # Using a color map to visualise distances
 plt.colorbar()
 plt.show()
 
 reconstruct = (dist_transform < 1)
 
-# Grayscale image
+# greyscale image
 plt.imshow(reconstruct, cmap='gray')
 plt.axis('off')
 plt.show()

@@ -16,7 +16,7 @@ print(f"Keys in the dictionary: {data.keys()}")
 image_data = data['masks']
 image_data = image_data.astype(np.int32)
 
-# Grayscale image
+# greyscale image
 plt.imshow(image_data, cmap='gray')
 plt.axis('off')
 plt.show()
@@ -39,7 +39,7 @@ for value in range(1, np.max(image_data) + 1):
     # Add the filled cell back to the mask with its unique value
     filled_mask[filled_cell] = value
 
-# Grayscale image
+# greyscale image
 plt.imshow(filled_mask, cmap='gray')
 plt.axis('off')
 plt.show()'''

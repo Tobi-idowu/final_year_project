@@ -18,7 +18,7 @@ image_data = data['outlines']
 
 
 
-# Grayscale image
+# greyscale image
 # plt.imshow(image_data, cmap='gray')
 # plt.axis('off')
 # plt.show()
