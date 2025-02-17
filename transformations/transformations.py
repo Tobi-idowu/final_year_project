@@ -8,8 +8,10 @@ import tifffile as tiff
 
 def distance_transform(file_path = None):
     #read in the image
-    file_path = '../cellpose_all/pupa_1_stage_1_cropped_0000_seg.npy'
+    file_path = '../data/segmented_data/segmentation_masks/pupa_1_stage_1_cropped_0000_masks.npy'
     data = np.load(file_path, allow_pickle=True)
+
+    print(data[0])
 
     #unpack the object
     data = data.item()
@@ -30,8 +32,8 @@ def distance_transform(file_path = None):
 
 def optic_flow(image1 = None, image2 = None):
     #read in the images
-    image1 = Image.open('../cellpose_all/pupa_1_stage_1_cropped_0006.tif')
-    image2 = Image.open('../cellpose_all/pupa_1_stage_1_cropped_0007.tif')
+    image1 = Image.open('../data/segmented_data/images/pupa_1_stage_1_cropped/pupa_1_stage_1_cropped_0006.tif')
+    image2 = Image.open('../data/segmented_data/images/pupa_1_stage_1_cropped/pupa_1_stage_1_cropped_0007.tif')
 
     #convert them into greyscale
     grey_image1 = np.array(image1.convert("L"))
@@ -55,7 +57,7 @@ def optic_flow(image1 = None, image2 = None):
 
 def cellpose_gradient_mask(image = None):
     #read in the image
-    image = tiff.imread(f'../cellpose_all/pupa_1_stage_1_cropped_0001.tif')
+    image = tiff.imread(f'../data/segmented_data/images/pupa_1_stage_1_cropped/pupa_1_stage_1_cropped_0000.tif')
 
     #instantiate the cellpose model
     #this might have to be cyto3
@@ -74,7 +76,8 @@ def cellpose_gradient_mask(image = None):
     return gradient_vectors
 
 def main():
-    cellpose_gradient_mask()
+    print(optic_flow())
+    print(cellpose_gradient_mask())
 
 
 main()

@@ -2,8 +2,8 @@ from PIL import Image
 import cv2
 import numpy as np
 
-frame1 = Image.open('../cellpose_all/pupa_1_stage_1_cropped_0006.tif')
-frame2 = Image.open('../cellpose_all/pupa_1_stage_1_cropped_0007.tif')
+frame1 = Image.open('../data/segmented_data/images/pupa_1_stage_1_cropped/pupa_1_stage_1_cropped_0006.tif')
+frame2 = Image.open('../data/segmented_data/images/pupa_1_stage_1_cropped/pupa_1_stage_1_cropped_0007.tif')
 
 grey1 = np.array(frame1.convert("L"))
 grey2 = np.array(frame2.convert("L"))

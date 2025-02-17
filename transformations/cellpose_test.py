@@ -7,7 +7,7 @@ import numpy as np
 #print(torch.cuda.is_available())  #should return True
 #print(torch.cuda.get_device_name(0))  #should print your GPU name
 
-image = tiff.imread(f'../cellpose_all/pupa_1_stage_1_cropped_0001.tif')
+image = tiff.imread(f'../data/segmented_data/images/pupa_1_stage_1_cropped/pupa_1_stage_1_cropped_0001.tif')
 
 #this might have to be cyto3
 model = models.Cellpose(model_type='cyto', gpu=True)

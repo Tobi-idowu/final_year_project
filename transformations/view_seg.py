@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 
 #allow loading object arrays
-file_path = 'cellpose_all/pupa_1_stage_1_cropped_0000_seg.npy'
+file_path = 'data/segmented_data/images/pupa_1_stage_1_cropped/pupa_1_stage_1_cropped_0000_seg.npy'
 data = np.load(file_path, allow_pickle=True)  
 
 #unpack the object
