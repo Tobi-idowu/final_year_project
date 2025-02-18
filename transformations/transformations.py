@@ -8,10 +8,8 @@ import tifffile as tiff
 
 def distance_transform(file_path = None):
     #read in the image
-    file_path = '../data/segmented_data/segmentation_masks/pupa_1_stage_1_cropped_0000_masks.npy'
+    file_path = '../data/segmented_data/segmentations/pupa_1_stage_1_cropped_0000_seg.npy'
     data = np.load(file_path, allow_pickle=True)
-
-    print(data[0])
 
     #unpack the object
     data = data.item()
@@ -76,8 +74,9 @@ def cellpose_gradient_mask(image = None):
     return gradient_vectors
 
 def main():
-    print(optic_flow())
-    print(cellpose_gradient_mask())
+    distance_transform()
+    #print(optic_flow())
+    #print(cellpose_gradient_mask())
 
 
 main()
