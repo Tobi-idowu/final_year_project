@@ -5,14 +5,14 @@ from PIL import Image
 from cellpose import models
 import tifffile as tiff
 
+#import cupy as cp
+#import cv2.cuda as cv2_cuda
+
 
 def distance_transform(file_path = None):
     #read in the image
     file_path = '../data/segmented_data/segmentations/pupa_1_stage_1_cropped_0000_seg.npy'
-    data = np.load(file_path, allow_pickle=True)
-
-    #unpack the object
-    data = data.item()
+    data = np.load(file_path, allow_pickle=True).item()
 
     #access the image data from the dictionary
     image_data = data['outlines']
@@ -36,10 +36,6 @@ def optic_flow(image1 = None, image2 = None):
     #convert them into greyscale
     grey_image1 = np.array(image1.convert("L"))
     grey_image2 = np.array(image2.convert("L"))
-
-    #input validation
-    if grey_image1.shape != grey_image2.shape:
-        raise ValueError("Images must be the same size for optical flow computation")
 
     #calculate optic flow
     flow = cv2.calcOpticalFlowFarneback(
@@ -74,9 +70,9 @@ def cellpose_gradient_mask(image = None):
     return gradient_vectors
 
 def main():
-    distance_transform()
+    #distance_transform()
     #print(optic_flow())
-    #print(cellpose_gradient_mask())
+    cellpose_gradient_mask()
 
 
 main()
