@@ -48,9 +48,9 @@ def optic_flow(image_path1 = "data/segmented_data/images/pupa_1_stage_1_cropped/
 
     return flow
 
-def cellpose_gradient_mask(image = None):
+def cellpose_gradient_mask(image_path = "data/segmented_data/images/pupa_1_stage_1_cropped/pupa_1_stage_1_cropped_0000.tif"):
     #read in the image
-    image = tiff.imread(f'data/segmented_data/images/pupa_1_stage_1_cropped/pupa_1_stage_1_cropped_0000.tif')
+    image = tiff.imread(image_path)
 
     #instantiate the cellpose model
     #this might have to be cyto3
@@ -86,7 +86,7 @@ def distance_transform_folder(folder_path, file_names):
         dist_transform = cv2.distanceTransform(binary_image, cv2.DIST_L2, 5)
 
         #flatten the distance transform into a 1d array
-        dist_transform = dist_transform.reshape(-1, )
+        dist_transform = dist_transform.reshape(-1,)
 
         dist_transforms[i] = dist_transform
 
@@ -95,7 +95,8 @@ def distance_transform_folder(folder_path, file_names):
 #transformation(parent_path, folder.name, sortedfile_names_array)
 
 def optic_flow_folder(parent_path, folder_name, file_names):
-    flows = np.empty((len(file_names) - 1, 1024*1024, 2))
+    flows_dx = np.empty((len(file_names) - 1, 1024*1024))
+    flows_dy = np.empty((len(file_names) - 1, 1024*1024))
 
     folder_path = parent_path + "/" + folder_name + "/"
 
@@ -118,40 +119,33 @@ def optic_flow_folder(parent_path, folder_name, file_names):
         #flatten the 3D array (height, width, 2) to a 2D array where each element is [dx, dy]
         flow = flow.reshape(-1, 2)
 
-        flows[i] = flow
+        flows_dx[i] = flow[:, 0]
+        flows_dy[i] = flow[:, 1]
 
-    return flows
+    return flows_dx, flows_dy
 
 def cellpose_gradient_mask_folder(model, parent_path, folder_name, file_names):
     #gradient_masks = np.empty((len(file_names) - 1, 1024*1024, 2))
 
     folder_path = parent_path + "/" + folder_name + "/"
 
-    images = []
-
-    #for i in range(len(file_names) - 1):
-    for i in range(2):
-        #read in the image
-        image = tiff.imread(folder_path + file_names[i])
-        images.append(image)
+    images = [tiff.imread(folder_path + f) for f in file_names]
 
     #unpack cellpose's output
     #unsure of the average diameter (average cell diameter in pixels)
     _, flows, _, _ = model.eval(images, diameter=60, channels=[0, 0])
 
-    #combine dx and dy for each pixel into a list of [dx, dy]
-    gradient_vectors1 = np.stack((flows[0][1][0], flows[0][1][1]), axis=-1)
+    gradient_masks_dx = np.empty((len(file_names), 1024*1024))
+    gradient_masks_dy = np.empty((len(file_names), 1024*1024))
 
-    #flatten the 3D array (height, width, 2) to a 2D array where each element is [dx, dy]
-    gradient_vectors1 = gradient_vectors1.reshape(-1,2)
+    for i in range(1, len(file_names)):
+        gradient_masks_dx[i] = flows[i][1][0].reshape(-1, )
+        gradient_masks_dy[i] = flows[i][1][1].reshape(-1, )
 
-    #combine dx and dy for each pixel into a list of [dx, dy]
-    gradient_vectors2 = np.stack((flows[1][1][0], flows[1][1][1]), axis=-1)
+        # #combine dx and dy for each pixel into a list of [dx, dy]
+        # gradient_masks[i] = np.stack((flows[i][1][0], flows[i][1][1]), axis=-1).reshape(-1,2)
 
-    #flatten the 3D array (height, width, 2) to a 2D array where each element is [dx, dy]
-    gradient_vectors2 = gradient_vectors2.reshape(-1,2)
-
-    return [gradient_vectors1, gradient_vectors2]
+    return gradient_masks_dx, gradient_masks_dy
 
 def main():
     #distance_transform()
