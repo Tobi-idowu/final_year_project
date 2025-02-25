@@ -23,7 +23,7 @@ def main():
     for folder in parent_folder.iterdir():
         if folder.is_dir():
             count += 1
-            print(f"Folder {count}:")
+            print(f"Folder {count}: {folder.name}")
 
             files = [f.name for f in folder.iterdir() if f.is_file()]
             files.sort()
@@ -43,7 +43,22 @@ def main():
                 training_data.append(training_example)
 
                 print(f"    File {i+1}/{len(files) - 1}  ")
-        
+
+                # print("=======================================================")
+                # print(dist_transforms[i])
+                # print(distance_transform(segmentations_path + files[i][:-4] + "_seg.npy"))
+                # print("=======================================================")
+
+                # print("=======================================================")
+                # print(optic_flows_dx[i], optic_flows_dy[i])
+                # print(optic_flow(parent_path + "/" + folder.name + "/" + files[i], parent_path + "/" + folder.name + "/" + files[i+1]))
+                # print("=======================================================")
+
+                # print("=======================================================")
+                # print(gradient_masks_dx[i], gradient_masks_dy[i])
+                # print(cellpose_gradient_mask(parent_path + "/" + folder.name + "/" + files[i+1]))
+                # print("=======================================================")
+
         # End the timer
         end_time = time.time()
 
@@ -57,7 +72,18 @@ def main():
 
     training_data = np.array(training_data)
 
-    np.save("data/training_data.npy", training_data)
+    np.savez_compressed("data/training_data.npz", training_data = training_data)
+
+    # End the timer
+    end_time = time.time()
+
+    elapsed_time = end_time - start_time
+
+    hours = elapsed_time // 3600  # Calculate hours
+    minutes = (elapsed_time % 3600) // 60  # Calculate minutes
+    seconds = elapsed_time % 60  # Calculate remaining seconds
+
+    print(f"Elapsed time: {hours} hours, {minutes} minutes, {seconds} seconds")
 
     return
 

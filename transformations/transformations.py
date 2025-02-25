@@ -92,8 +92,6 @@ def distance_transform_folder(folder_path, file_names):
 
     return dist_transforms
 
-#transformation(parent_path, folder.name, sortedfile_names_array)
-
 def optic_flow_folder(parent_path, folder_name, file_names):
     flows_dx = np.empty((len(file_names) - 1, 1024*1024))
     flows_dy = np.empty((len(file_names) - 1, 1024*1024))
@@ -125,8 +123,6 @@ def optic_flow_folder(parent_path, folder_name, file_names):
     return flows_dx, flows_dy
 
 def cellpose_gradient_mask_folder(model, parent_path, folder_name, file_names):
-    #gradient_masks = np.empty((len(file_names) - 1, 1024*1024, 2))
-
     folder_path = parent_path + "/" + folder_name + "/"
 
     images = [tiff.imread(folder_path + f) for f in file_names]
@@ -135,15 +131,12 @@ def cellpose_gradient_mask_folder(model, parent_path, folder_name, file_names):
     #unsure of the average diameter (average cell diameter in pixels)
     _, flows, _, _ = model.eval(images, diameter=60, channels=[0, 0])
 
-    gradient_masks_dx = np.empty((len(file_names), 1024*1024))
-    gradient_masks_dy = np.empty((len(file_names), 1024*1024))
+    gradient_masks_dx = np.empty((len(file_names)-1, 1024*1024))
+    gradient_masks_dy = np.empty((len(file_names)-1, 1024*1024))
 
-    for i in range(1, len(file_names)):
-        gradient_masks_dx[i] = flows[i][1][0].reshape(-1, )
-        gradient_masks_dy[i] = flows[i][1][1].reshape(-1, )
-
-        # #combine dx and dy for each pixel into a list of [dx, dy]
-        # gradient_masks[i] = np.stack((flows[i][1][0], flows[i][1][1]), axis=-1).reshape(-1,2)
+    for i in range(len(file_names)-1):
+        gradient_masks_dx[i] = flows[i+1][1][0].reshape(-1, )
+        gradient_masks_dy[i] = flows[i+1][1][1].reshape(-1, )
 
     return gradient_masks_dx, gradient_masks_dy
 
