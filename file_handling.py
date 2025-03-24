@@ -1,22 +1,29 @@
 import os
+import glob
+import shutil
 
-folder_path = "data/segmented_data/images"
+# Source and destination folders
+source_folder = "path/to/source/folder"
+destination_folder = "path/to/destination/folder"
 
-# Get all file names recursively
-file_names = []
-for root, dirs, files in os.walk(folder_path):
-    for file in files:
-        file_names.append(os.path.join(root, file).split("/")[-1])
+# Ensure the destination folder exists
+os.makedirs(destination_folder, exist_ok=True)
 
-# Path to the folder containing the corresponding files
-folder_path = "data/segmented_data/segmentations"
+# Loop through all files matching the pattern and move them
+for file_path in glob.glob(os.path.join(source_folder, "*_seg.npy")):
+    shutil.move(file_path, destination_folder)
 
-# Check if corresponding _seg.npy files exist
-for file in file_names:
-    base_name = os.path.splitext(file)[0]  # Remove .tif extension
-    corresponding_file = f"{base_name}_seg.npy"
+print("Files moved successfully!")
+
+# # Folder containing the files
+# folder_path = "path/to/your/folder"
+
+# # Loop through all files that match the pattern
+# for file_path in glob.glob(os.path.join(folder_path, "*_editted_seg.npy")):
+#     # New filename (replace '_editted_seg.npy' with '_seg.npy')
+#     new_file_path = file_path.replace("_editted_seg.npy", "_seg.npy")
     
-    if corresponding_file in os.listdir(folder_path):  
-        print(f"✅ Found: {corresponding_file}")
-    else:
-        print(f"❌ Missing: {corresponding_file}")
+#     # Rename the file
+#     os.rename(file_path, new_file_path)
+
+# print("Renaming complete!")
