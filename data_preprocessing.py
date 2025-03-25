@@ -13,12 +13,17 @@ def main():
     #this might have to be cyto3
     cellpose_model = models.Cellpose(model_type='cyto', gpu=True)
 
-    training_data = []
+    training_examples = []
+    targets = []
 
     # Start the timer
     start_time = time.time()
 
     count = 0
+
+    running_sum = np.zeros((5, 1024, 1024))
+    running_sum_sq = np.zeros((5, 1024, 1024))
+    n = 0
 
     for folder in parent_folder.iterdir():
         if folder.is_dir():
@@ -29,20 +34,31 @@ def main():
             files.sort()
 
             #calculate distance transform for each image
+            print(f"    Distance Transform")
             segmentations_path = parent_path[:-6] + "segmentations/"
-            dist_transforms = distance_transform_folder(segmentations_path, files)
+            dist_transforms, binary_images = distance_transform_folder(segmentations_path, files)
 
             #calculate the optical flow for each image
+            print(f"    Optic Flow")
             optic_flows_dx, optic_flows_dy = optic_flow_folder(parent_path, folder.name, files)
 
             #get the cellpose output for each image
+            print(f"    Cellpose")
             gradient_masks_dx, gradient_masks_dy = cellpose_gradient_mask_folder(cellpose_model, parent_path, folder.name, files)
 
             for i in range(len(files) - 1):
-                training_example = [dist_transforms[i], optic_flows_dx[i], optic_flows_dy[i], gradient_masks_dx[i], gradient_masks_dy[i], dist_transforms[i+1]]
-                training_data.append(training_example)
+                # append the converted data to the training data
+                training_example = [dist_transforms[i], optic_flows_dx[i], optic_flows_dy[i], gradient_masks_dx[i], gradient_masks_dy[i]]
+                training_examples.append(training_example)
 
-                print(f"    File {i+1}/{len(files) - 1}  ")
+                target = binary_images[i+1]
+                targets.append(target)
+
+                print(f"    Example {i+1}/{len(files) - 1}")
+
+                running_sum += training_example
+                running_sum_sq += np.array(training_example)**2
+                n += 1024*1024
 
                 # print("=======================================================")
                 # print(dist_transforms[i])
@@ -70,15 +86,26 @@ def main():
 
         print(f"    Elapsed time: {hours} hours, {minutes} minutes, {seconds} seconds")
 
-    training_data = np.array(training_data)
+    # convert training data into numpy arrays
+    training_examples = np.array(training_examples)
+    targets = np.array(targets)
 
-    np.savez_compressed("data/training_data.npz", training_data = training_data)
+    # compute the mean and standard deviation for each channel
+    mean = running_sum.sum(dim=(1,2)) / n
+    variance = (running_sum_sq.sum(dim=(1,2)) / n) - mean**2
+    sd = np.sqrt(variance)
+
+    # normalise the training examples
+    normalised_examples = (training_examples - mean[:, np.newaxis, np.newaxis]) / sd[:, np.newaxis, np.newaxis]
+
+    #save the training data to the numpy file
+    np.savez_compressed("data/training_data.npz", normalised_examples = normalised_examples, targets = targets)
 
     # End the timer
     end_time = time.time()
 
+    # convert elapsed seconds to hours minutes and seconds
     elapsed_time = end_time - start_time
-
     hours = elapsed_time // 3600  # Calculate hours
     minutes = (elapsed_time % 3600) // 60  # Calculate minutes
     seconds = elapsed_time % 60  # Calculate remaining seconds
