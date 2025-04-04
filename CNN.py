@@ -38,7 +38,7 @@ class UNet(Model):
     def upconv_block(self, filters):
         """Returns an upsampling block with a transposed convolution followed by a conv block."""
         return tf.keras.Sequential([
-            layers.Conv2DTranspose(filters, kernel_size=2, strides=2, padding="same"),
+            layers.Conv2DTranspose(filters, kernel_size=2, strides=2, padding="same"),  # learns the upsampling process
             self.conv_block(filters)
 
             # maybe have the following instead calling self.con_block
