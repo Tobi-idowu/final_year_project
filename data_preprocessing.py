@@ -5,8 +5,10 @@ import numpy as np
 import time
 import h5py
 
+# Start the timer
+start_time = time.time()
 
-def main():
+def preprocess_data():
     parent_path = "data/segmented_data/images"
     parent_folder = Path(parent_path)
 
@@ -16,9 +18,6 @@ def main():
 
     training_examples = []
     targets = []
-
-    # Start the timer
-    start_time = time.time()
 
     folder_count = 0
 
@@ -45,19 +44,19 @@ def main():
             segmentations_path = parent_path[:-6] + "segmentations/"
             dist_transforms, binary_images = distance_transform_folder(segmentations_path, files)
 
-            print_time_elapsed(start_time)
+            print_time_elapsed()
 
             #calculate the optical flow for each image
             print(f"    Optic Flow")
             optic_flows_dx, optic_flows_dy = optic_flow_folder(parent_path, folder.name, files)
 
-            print_time_elapsed(start_time)
+            print_time_elapsed()
 
             #get the cellpose output for each image
             print(f"    Cellpose")
             gradient_masks_dx, gradient_masks_dy = cellpose_gradient_mask_folder(cellpose_model, parent_path, folder.name, files)
 
-            print_time_elapsed(start_time)
+            print_time_elapsed()
 
             for i in range(len(files) - 1):
                 # append the converted data to the training data
@@ -88,7 +87,7 @@ def main():
                     buffer_len = 0
                     buffer_num += 1
 
-        print_time_elapsed(start_time)
+        print_time_elapsed()
 
     # if buffer isnt empty write it to file
     if buffer_len != 0:
@@ -113,11 +112,52 @@ def main():
 
     print("==========MEAN AND SD STORED==========")
 
-    print_time_elapsed(start_time)
+    print_time_elapsed()
 
     return
 
-def print_time_elapsed(start_time):
+
+def normalise_data():
+    print("==========NORMALISING DATA==========")
+
+    buffer_num = 0
+
+    mean = None
+    sd = None
+
+    key = "training_examples0"
+
+    with h5py.File("data/training_data.h5", "r") as f:
+        mean = f["mean"][:]
+        sd = f["sd"][:]
+
+    print(mean)
+    print(sd)
+    print()
+
+    with h5py.File("data/training_data.h5", "r+") as f:
+        while key in f:
+            print(f"Buffer num: {buffer_num}")
+
+            unnormalised_data = f[key][:]
+
+            normalised_data = (unnormalised_data - mean[:, np.newaxis, np.newaxis]) / sd[:, np.newaxis, np.newaxis]
+
+            f.create_dataset(f"normalised_training_examples{buffer_num}", data = normalised_data.transpose(0, 2, 3, 1), compression = "gzip")
+
+            del f[key]
+
+            buffer_num += 1
+            key = f"training_examples{buffer_num}"
+
+            print_time_elapsed()
+
+    print(buffer_num)
+
+    return
+
+
+def print_time_elapsed():
     # End the timer
     end_time = time.time()
 
@@ -131,7 +171,8 @@ def print_time_elapsed(start_time):
 
     
 if __name__ == "__main__":
-    main()
+    preprocess_data()
+    normalise_data()
 
 
                 # print("=======================================================")
