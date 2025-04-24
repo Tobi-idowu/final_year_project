@@ -3,29 +3,19 @@ import tifffile as tiff
 import cv2
 import numpy as np
 
-#import torch
-#print(torch.cuda.is_available())  #should return True
-#print(torch.cuda.get_device_name(0))  #should print your GPU name
+# read in target image
+image = tiff.imread('../data/segmented_data/images/pupa_1_stage_1_cropped/pupa_1_stage_1_cropped_0001.tif')
 
-image = tiff.imread(f'../data/segmented_data/images/pupa_1_stage_1_cropped/pupa_1_stage_1_cropped_0001.tif')
-
-#this might have to be cyto3
+# instantiate the cellpose model
 model = models.Cellpose(model_type='cyto', gpu=True)
 
-#unsure of the average diameter (average cell diameter in pixels)
-#masks → The segmented cell masks (each cell has a unique integer label).
-#flows → A list containing various flow-related outputs:
-#  flows[0] → The gradient (vector) flow field, which is the gradient mask where every pixel points toward the cell center.
-#  flows[1] → The cell boundary map.
-#  flows[2] → The Cellpose "heat map" representation.
-#styles → The style vectors used for training.
-#diams → The estimated average cell diameter.
+# unpack cellpose output
 masks, flows, styles, diams = model.eval([image], diameter=60, channels=[0, 0])
 
-#combine dx and dy for each pixel into a list of [dx, dy]
+# combine dx and dy for each pixel into a list of [dx, dy]
 gradient_vectors = np.stack((flows[0][1][0], flows[0][1][1]), axis=-1)
 
-#flatten the 3D array (height, width, 2) to a 2D array where each element is [dx, dy]
+# flatten the 3D array (height, width, 2) to a 2D array where each element is [dx, dy]
 gradient_vectors = gradient_vectors.reshape(1024,1024,2)
 
 visualisation = np.array(image)

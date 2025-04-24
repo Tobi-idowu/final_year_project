@@ -1,4 +1,4 @@
-from transformations.transformations import distance_transform, optic_flow, cellpose_gradient_mask, distance_transform_folder, optic_flow_folder, cellpose_gradient_mask_folder
+from transformations.transformations import distance_transform_folder, optic_flow_folder, cellpose_gradient_mask_folder
 from pathlib import Path
 from cellpose import models
 import numpy as np
@@ -13,29 +13,32 @@ def preprocess_data():
     parent_folder = Path(parent_path)
 
     #instantiate the cellpose model
-    #this might have to be cyto3
     cellpose_model = models.Cellpose(model_type='cyto', gpu=True)
 
+    #initialise the buffer variables
     training_examples = []
     targets = []
+    buffer_len = 0
+    buffer_num = 0
 
     folder_count = 0
 
+    #initialise running totals
     running_sum = np.zeros((5, 1024, 1024))
     running_sum_sq = np.zeros((5, 1024, 1024))
     n = 0
-    buffer_len = 0
-    buffer_num = 0
 
     # empty the file
     with h5py.File("data/training_data.h5", "w") as f:
         pass
 
+    #iterate through each folder
     for folder in parent_folder.iterdir():
         if folder.is_dir():
             folder_count += 1
             print(f"Folder {folder_count}: {folder.name}")
 
+            #create array of all the names of the images in the folder
             files = [f.name for f in folder.iterdir() if f.is_file()]
             files.sort()
 
@@ -62,17 +65,18 @@ def preprocess_data():
                 # append the converted data to the training data
                 training_example = [dist_transforms[i], optic_flows_dx[i], optic_flows_dy[i], gradient_masks_dx[i], gradient_masks_dy[i]]
                 training_examples.append(training_example)
-
                 target = binary_images[i+1]
                 targets.append(target)
 
                 print(f"    Example {i+1}/{len(files) - 1}")
 
+                #update running totals
                 running_sum += training_example
                 running_sum_sq += np.array(training_example)**2
                 n += 1024*1024
                 buffer_len += 1
 
+                #if the buffer has fills
                 if buffer_len == 50:
                     # write buffer to file
                     with h5py.File("data/training_data.h5", "a") as f:
@@ -106,6 +110,7 @@ def preprocess_data():
 
     print("==========STORE MEAN AND SD==========")
 
+    #write the mean and standard deviation to the file
     with h5py.File("data/training_data.h5", "a") as f:
         f.create_dataset("mean", data = mean, compression = "gzip")
         f.create_dataset("sd", data = sd, compression = "gzip")
@@ -121,11 +126,10 @@ def normalise_data():
     print("==========NORMALISING DATA==========")
 
     buffer_num = 0
+    key = "training_examples0"
 
     mean = None
     sd = None
-
-    key = "training_examples0"
 
     with h5py.File("data/training_data.h5", "r") as f:
         mean = f["mean"][:]
@@ -136,17 +140,21 @@ def normalise_data():
     print()
 
     with h5py.File("data/training_data.h5", "r+") as f:
+        #for each buffer in file
         while key in f:
             print(f"Buffer num: {buffer_num}")
 
+            #normalise the data
             unnormalised_data = f[key][:]
-
             normalised_data = (unnormalised_data - mean[:, np.newaxis, np.newaxis]) / sd[:, np.newaxis, np.newaxis]
 
+            #reshape the data for the neural network
             f.create_dataset(f"normalised_training_examples{buffer_num}", data = normalised_data.transpose(0, 2, 3, 1), compression = "gzip")
 
+            #remove the unnormalised buffer
             del f[key]
 
+            #set up next iteration
             buffer_num += 1
             key = f"training_examples{buffer_num}"
 
@@ -173,48 +181,3 @@ def print_time_elapsed():
 if __name__ == "__main__":
     preprocess_data()
     normalise_data()
-
-
-                # print("=======================================================")
-                # print(dist_transforms[i])
-                # print(distance_transform(segmentations_path + files[i][:-4] + "_seg.npy"))
-                # print("=======================================================")
-
-                # print("=======================================================")
-                # print(optic_flows_dx[i], optic_flows_dy[i])
-                # print(optic_flow(parent_path + "/" + folder.name + "/" + files[i], parent_path + "/" + folder.name + "/" + files[i+1]))
-                # print("=======================================================")
-
-                # print("=======================================================")
-                # print(gradient_masks_dx[i], gradient_masks_dy[i])
-                # print(cellpose_gradient_mask(parent_path + "/" + folder.name + "/" + files[i+1]))
-                # print("=======================================================")
-
-
-    # print("==========DATA STORED==========")
-
-    # # convert training data into numpy arrays
-    # training_examples = np.array(training_examples)
-    # targets = np.array(targets)
-
-    # # compute the mean and standard deviation for each channel
-    # mean = running_sum.sum(axis=(1,2)) / n
-    # variance = (running_sum_sq.sum(axis=(1,2)) / n) - mean**2
-    # sd = np.sqrt(variance)
-
-    # # normalise the training examples
-    # normalised_examples = (training_examples - mean[:, np.newaxis, np.newaxis]) / sd[:, np.newaxis, np.newaxis]
-
-    # # #save the training data to the numpy file
-    # # np.savez_compressed("data/training_data.npz", normalised_examples = normalised_examples, targets = targets, mean = mean, sd = sd)
-
-    # print("==========DATA NORMALISED==========")
-    
-    # # save training data efficiently
-    # with h5py.File("data/training_data.h5", "w") as f:
-    #     f.create_dataset("training_examples", data = normalised_examples, compression = "gzip")
-    #     f.create_dataset("targets", data = targets, compression = "gzip")
-    #     f.create_dataset("mean", data = mean, compression = "gzip")
-    #     f.create_dataset("sd", data = sd, compression = "gzip")
-
-    # print("==========DATA SAVED TO FILE==========")
