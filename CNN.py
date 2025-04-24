@@ -38,7 +38,7 @@ class UNet(Model):
     def upconv_block(self, filters):
         """Returns an upsampling block with a transposed convolution followed by a conv block."""
         return tf.keras.Sequential([
-            layers.Conv2DTranspose(filters, kernel_size=2, strides=2, padding="same"),  # learns the upsampling process
+            layers.Conv2DTranspose(filters, kernel_size=2, strides=2, padding="same"),   #upsampling layer
             
             layers.Conv2D(filters, kernel_size=3, padding="same"),
             layers.BatchNormalization(),
@@ -83,23 +83,22 @@ class UNet(Model):
 
         return outputs
 
-# Example usage
 if __name__ == "__main__":
-    # Create model instance
+    # create model instance
     model = UNet(num_classes=1)
     
     # define the input shape
     model.build(input_shape=(None, 1024, 1024, 5))
 
-    # Compile the model
+    # compile the model
     model.compile(optimizer="adam", loss="binary_crossentropy", metrics=["accuracy"])
 
-    # Define dummy data
+    # define dummy data
     x_train = np.random.rand(10, 1024, 1024, 5)
     y_train = np.random.rand(10, 1024, 1024, 1)
 
-    # Train the model
+    # train the model
     model.fit(x_train, y_train, epochs=2)
 
-    # Print model summary
+    # print model summary
     model.summary()
