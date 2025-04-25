@@ -40,7 +40,7 @@ for y in range(0, grey1.shape[0], step):
         end_point = (int(x + dx), int(y + dy))
 
         # draw the arrow on the image (use arrowedLine for visualisation)
-        cv2.arrowedLine(flow_visualisation, start_point, end_point, (0, 255, 0), 1, tipLength=0.1)
+        cv2.arrowedLine(flow_visualisation, start_point, end_point, (0, 255, 0), 1, tipLength=0.3)
 
 # display the result
 cv2.imshow("Optical Flow with Arrows", flow_visualisation)

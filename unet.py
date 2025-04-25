@@ -25,7 +25,7 @@ class UNet(Model):
         self.output_layer = layers.Conv2D(num_classes, kernel_size=1, activation="sigmoid")
 
     def conv_block(self, filters):
-        """Returns a convolutional block with two conv layers followed by batch normalisation and ReLU."""
+        """Returns a convolutional block with two conv layers followed by batch normalisation and ReLU"""
         return tf.keras.Sequential([
             layers.Conv2D(filters, kernel_size=3, padding="same"),
             layers.BatchNormalization(),
@@ -36,7 +36,7 @@ class UNet(Model):
         ])
 
     def upconv_block(self, filters):
-        """Returns an upsampling block with a transposed convolution followed by a conv block."""
+        """Returns an upsampling block with a transposed convolution followed by a conv block"""
         return tf.keras.Sequential([
             layers.Conv2DTranspose(filters, kernel_size=2, strides=2, padding="same"),   #upsampling layer
             
